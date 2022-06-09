@@ -4,12 +4,16 @@
   "description": "My own movie tracker to rate the movies I watched",
   "main": "index.js",
   "scripts": {
-    "start": "node ./src/server.js"
+    "start": "node ./src/server.js",
+    "dev": "nodemon ./src/server.js"
   },
   "keywords": [],
   "author": "Amanda Guerra",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
   }
 }
