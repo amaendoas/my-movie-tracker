@@ -1,4 +1,4 @@
-# My Movie Tracker
+# Rocket Movie
 My own movie tracker to rate the movies I watched
 
 ## Status
