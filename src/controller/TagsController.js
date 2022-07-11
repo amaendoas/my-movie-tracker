@@ -6,8 +6,17 @@ class TagsController {
 
     const tags = await knex("movie-tags")
     .where({ user_id })
+    .groupBy("name")
 
     return response.json(tags)
+  }
+
+  async delete(request, response) {
+    const { id } = request.params;
+
+    await knex("movie-tags").where({note_id: id}).delete()
+
+    return response.json()
   }
 }
 

@@ -1,4 +1,6 @@
-const knex = require("../database/knex")
+const knex = require("../database/knex");
+const sqliteConnection = require('../database/sqlite');
+const AppError = require("../utils/AppError");
 
 class NotesController {
   async create(request, response) {
@@ -12,18 +14,67 @@ class NotesController {
       user_id
     })
 
+    if(!tags) {
+      return response.json()
+    }
+    else {
+      const tagsInsert = tags.map(name => {
+        return {
+          note_id,
+          name,
+          user_id
+        }
+      })
+  
+      await knex("movie-tags").insert(tagsInsert)
+    }
+
+    return response.json()
+
+  }
+
+  async update(request, response) {
+    const { title, description, tags, rating } = request.body
+    const { id } = request.params;
+    const user_id = request.user.id;
+
+    const database = await sqliteConnection();
+    const note = await database.get("SELECT * FROM 'movie-notes' WHERE id = (?)", [id]);
+
+    if(!note) {
+      throw new AppError("Nota não encontrada!")
+    }
+
+    note.title = title ?? note.title;
+    note.description = description ?? note.description;
+    note.rating = rating ?? note.rating;
+    
+    await database.run(`
+    UPDATE 'movie-notes' SET
+    title = ?,
+    description = ?,
+    rating = ?,
+    updated_at = DATETIME('now')
+    WHERE id = ?
+    `, [note.title, note.description, note.rating, id])
+  
+  if(!tags) {
+    return response.json()
+
+  } else {
+    
     const tagsInsert = tags.map(name => {
       return {
-        note_id,
+        note_id: id,
         name,
         user_id
       }
     })
-
-    await knex("movie-tags").insert(tagsInsert)
-
+    
+    await knex("movie-tags").where({note_id: id}).delete()
+    await knex("movie-tags").insert(tagsInsert).where({note_id: id})
+  }
     return response.json()
-
   }
 
   async show(request, response) {
@@ -64,6 +115,7 @@ class NotesController {
       .whereLike("movie-notes.title", `%${title}%`)
       .whereIn("name", filterTags)
       .innerJoin("movie-notes", "movie-notes.id", "movie-tags.note_id")
+      .groupBy("movie-notes.id")
       .orderBy("movie-notes.title")
 
     } else {

@@ -12,6 +12,7 @@ notesRoutes.post("/", notesController.create);
 notesRoutes.get("/:id", notesController.show);
 notesRoutes.delete("/:id", notesController.delete);
 notesRoutes.get("/", notesController.index);
+notesRoutes.put("/:id", notesController.update);
 
 
 module.exports = notesRoutes;

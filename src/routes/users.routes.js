@@ -15,6 +15,7 @@ const userAvatarController = new UserAvatarController;
 
 usersRoutes.post("/", usersController.create);
 usersRoutes.put("/", ensureAuthenticated, usersController.update);
+usersRoutes.delete("/", ensureAuthenticated, usersController.delete);
 usersRoutes.patch("/avatar", ensureAuthenticated, upload.single("avatar"), userAvatarController.update)
 
 module.exports = usersRoutes;
