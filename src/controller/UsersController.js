@@ -71,7 +71,14 @@ class UsersController {
   async delete(request, response) {
     const user_id = request.user.id;
 
-    await knex("users").where({id: user_id}).delete()
+    const database = await sqliteConnection()
+    const notes = await database.get("SELECT * FROM 'movie-notes' WHERE id = (?)", [user_id])
+
+    if(!notes) {
+      await knex("users").where({id: user_id}).delete()
+    } else {
+      throw new AppError("Por favor, apague todos os seus filmes para deletar sua conta!")
+    }
 
     return response.json()
   }
